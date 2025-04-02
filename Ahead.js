@@ -5,7 +5,11 @@
  //Carregamento de dados 
  const cities = [];
      fetch(endpoint)
-     .then(blob => blob.json())
+     .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+     })
+    //  .then(blob => blob.json())
      .then(data => cities.push(...data))
  
  //Filtragem de dados
@@ -19,6 +23,17 @@
  //Formatação de numeros
  function numberWithCommas(x) {
       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+ }
+
+ //Ajuste nas chamadas a Api reduzindo o tempo de resposta
+ function debounce(func, wait = 200) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(this, args);
+        }, wait);
+    }
  }
 
  //Exibir resultados
@@ -41,6 +56,5 @@
  const searchInput = document.querySelector('.search');
  const suggestions = document.querySelector('.suggestions');
 
- searchInput.addEventListener('change', displayMatches); //eventos que são disparados apos mudanças e tecla
- searchInput.addEventListener('keyup', displayMatches);
+ searchInput.addEventListener('input', debounce(displayMatches)); //eventos que são disparados apos mudanças e tecla
 
